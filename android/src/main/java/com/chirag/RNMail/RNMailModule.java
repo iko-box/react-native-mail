@@ -85,7 +85,7 @@ public class RNMailModule extends ReactContextBaseJavaModule {
       ReadableArray bccRecipients = options.getArray("bccRecipients");
       i.putExtra(Intent.EXTRA_BCC, readableArrayToStringArray(bccRecipients));
     }
-
+    Uri uri;
     if (options.hasKey("attachment") && !options.isNull("attachment")) {
       ReadableMap attachment = options.getMap("attachment");
       if (attachment.hasKey("path") && !attachment.isNull("path")) {
@@ -94,7 +94,7 @@ public class RNMailModule extends ReactContextBaseJavaModule {
 
         String provider = reactContext.getApplicationContext().getPackageName() + ".provider";
 
-        Uri p = FileProvider.getUriForFile(reactContext, provider, file);
+        uri = FileProvider.getUriForFile(reactContext, provider, file);
 
         List<ResolveInfo> resolvedIntentActivities = reactContext.getPackageManager().queryIntentActivities(i,
             PackageManager.MATCH_DEFAULT_ONLY);
@@ -136,7 +136,9 @@ public class RNMailModule extends ReactContextBaseJavaModule {
         callback.invoke("error");
       }
     }
-    reactContext.revokeUriPermissionfileUri(Intent.FLAG_GRANT_WRITE_URI_PERMISSION | Intent.FLAG_GRANT_READ_URI_PERMISSION);
-
+    if (uri) {
+      reactContext.revokeUriPermission(uri,
+          Intent.FLAG_GRANT_WRITE_URI_PERMISSION | Intent.FLAG_GRANT_READ_URI_PERMISSION);
+    }
   }
 }
