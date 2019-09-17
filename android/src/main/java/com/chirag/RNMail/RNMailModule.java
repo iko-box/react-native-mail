@@ -136,5 +136,7 @@ public class RNMailModule extends ReactContextBaseJavaModule {
         callback.invoke("error");
       }
     }
+    reactContext.revokeUriPermissionfileUri(Intent.FLAG_GRANT_WRITE_URI_PERMISSION | Intent.FLAG_GRANT_READ_URI_PERMISSION);
+
   }
 }
