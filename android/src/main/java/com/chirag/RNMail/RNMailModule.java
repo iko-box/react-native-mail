@@ -100,7 +100,6 @@ public class RNMailModule extends ReactContextBaseJavaModule {
             PackageManager.MATCH_DEFAULT_ONLY);
         for (ResolveInfo resolvedIntentInfo : resolvedIntentActivities) {
           String packageName = resolvedIntentInfo.activityInfo.packageName;
-
           reactContext.grantUriPermission(packageName, uri,
               Intent.FLAG_GRANT_WRITE_URI_PERMISSION | Intent.FLAG_GRANT_READ_URI_PERMISSION);
         }
@@ -136,9 +135,10 @@ public class RNMailModule extends ReactContextBaseJavaModule {
         callback.invoke("error");
       }
     }
-    if (uri != null) {
-      reactContext.revokeUriPermission(uri,
-          Intent.FLAG_GRANT_WRITE_URI_PERMISSION | Intent.FLAG_GRANT_READ_URI_PERMISSION);
-    }
+    /*
+     * if (uri != null) { reactContext.revokeUriPermission(uri,
+     * Intent.FLAG_GRANT_WRITE_URI_PERMISSION |
+     * Intent.FLAG_GRANT_READ_URI_PERMISSION); }
+     */
   }
 }
