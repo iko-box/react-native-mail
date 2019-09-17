@@ -16,6 +16,7 @@ import com.facebook.react.bridge.Callback;
 
 import java.util.List;
 import java.io.File;
+import java.net.URI;
 
 /**
  * NativeModule that allows JS to open emails sending apps chooser.
@@ -35,12 +36,12 @@ public class RNMailModule extends ReactContextBaseJavaModule {
   }
 
   /**
-    * Converts a ReadableArray to a String array
-    *
-    * @param r the ReadableArray instance to convert
-    *
-    * @return array of strings
-  */
+   * Converts a ReadableArray to a String array
+   *
+   * @param r the ReadableArray instance to convert
+   *
+   * @return array of strings
+   */
   private String[] readableArrayToStringArray(ReadableArray r) {
     int length = r.size();
     String[] strArray = new String[length];
@@ -90,11 +91,22 @@ public class RNMailModule extends ReactContextBaseJavaModule {
       if (attachment.hasKey("path") && !attachment.isNull("path")) {
         String path = attachment.getString("path");
         File file = new File(path);
-        Uri p = FileProvider.getUriForFile(
-                reactContext,
-                reactContext.getApplicationContext()
-                        .getPackageName() + ".provider", file);
+
+        String provider = reactContext.getApplicationContext().getPackageName() + ".provider";
+
+        Uri p = FileProvider.getUriForFile(reactContext, provider, file);
+
+        List<ResolveInfo> resolvedIntentActivities = reactContext.getPackageManager().queryIntentActivities(i,
+            PackageManager.MATCH_DEFAULT_ONLY);
+        for (ResolveInfo resolvedIntentInfo : resolvedIntentActivities) {
+          String packageName = resolvedIntentInfo.activityInfo.packageName;
+
+          reactContext.grantUriPermission(packageName, p,
+              Intent.FLAG_GRANT_WRITE_URI_PERMISSION | Intent.FLAG_GRANT_READ_URI_PERMISSION);
+        }
+        i.addFlags(Intent.FLAG_GRANT_READ_URI_PERMISSION);
         i.putExtra(Intent.EXTRA_STREAM, p);
+
       }
     }
 
@@ -107,6 +119,7 @@ public class RNMailModule extends ReactContextBaseJavaModule {
     }
 
     if (list.size() == 1) {
+
       i.addFlags(Intent.FLAG_ACTIVITY_NEW_TASK);
       try {
         reactContext.startActivity(i);
